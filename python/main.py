@@ -1,6 +1,7 @@
 from db import get_products, add_products
 from Product import Product
 from Cart import CartItem, Cart
+from gui import init_screen
 def main():
     # new_product_example = Product("shoe", 5, 55, 123456) 
     # add_products(new_product_example)
@@ -19,6 +20,7 @@ def main():
     
     print(newCart)
 
+    init_screen()
 
 
 

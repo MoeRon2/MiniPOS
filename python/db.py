@@ -20,6 +20,16 @@ def add_products(product):
         cur.execute("""INSERT INTO products (name, price, stock, barcode) VALUES (?, ?, ?, ?)""", product_data)
         con.commit()
 
+def add_to_cart(barcode):
+    with get_connection() as con:
+        cur = con.cursor()
+        res = cur.execute("""SELECT name, price, stock, barcode FROM products WHERE barcode = ?""", (barcode,))
+        attributes = res.fetchone()
+        print(attributes)
+        product = Product(*attributes)
+        print(product)
+        return product
+
 
 
 #  getting column names

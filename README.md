@@ -37,21 +37,11 @@ python3 main.py
 5.Complete the sale – the stock of each product is updated accordingly.
 
 🧠 What I Learned
-Building GUIs using tkinter
-
-Managing application state with classes
-
-Connecting to SQLite databases in Python
-
-Executing SQL transactions and updates
-
-Separating logic into modules (cart.py, db.py, etc.)
-
-Avoiding circular imports
-
-Writing MVP-level functional apps without overengineering
+I learned how different parts of a program can connect to each other. (The MVC Idea), and the separation of concerns (even though I did it badly).
 
 🔮 Future Improvements
+ Refactor tons of stuff, right now naming conventions are not consistent, the code is not very efficient, and going towards something that will be hard to scale. 
+
  Make a working discount button (Now it's just for visual)
 
  Add stock checks before adding to the cart

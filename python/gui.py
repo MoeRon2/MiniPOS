@@ -86,7 +86,7 @@ def create_button(right_frame, callback, text):
     return button
 
 # Configure grid weights
-def configure_grid_weights(root, content, left_top_frame, right_frame):
+def configure_grid_weights(root, content, left_top_frame, right_frame, left_bottom_frame):
     root.columnconfigure(0, weight=1)
     root.rowconfigure(0, weight=1)
     content.columnconfigure(0, weight=6)
@@ -114,6 +114,16 @@ def configure_grid_weights(root, content, left_top_frame, right_frame):
     right_frame.rowconfigure(3, weight=0)
     right_frame.rowconfigure(4, weight=0)
     right_frame.rowconfigure(5, weight=1)
+
+    left_bottom_frame.rowconfigure(0, weight=1)
+    left_bottom_frame.rowconfigure(1, weight=1)
+    left_bottom_frame.rowconfigure(2, weight=1)
+    left_bottom_frame.rowconfigure(3, weight=1)
+    left_bottom_frame.rowconfigure(4, weight=1)
+    left_bottom_frame.rowconfigure(5, weight=1)
+    left_bottom_frame.columnconfigure(0, weight=1)
+    left_bottom_frame.columnconfigure(1, weight=0)
+    left_bottom_frame.columnconfigure(2, weight=1)
 
 def increase_quantity(tree, total_price_var):
     selected = tree.focus()  # Get the selected item's ID
@@ -189,6 +199,50 @@ def refresh_cart_treeview(treev, cart, total_price_var):
         treev.insert('', 'end', values=(cart_item.name, cart_item.price, cart_item.quantity))
     total_price_var.set(cart.get_total_price())
 
+def button_test():
+    print("button clicked")
+
+import tkinter as tk
+from tkinter import ttk
+
+def open_add_product_form(root):
+    form = tk.Toplevel(root)
+    form.title("Add Product")
+    form.geometry("400x400")
+    form.resizable(False, False)
+
+    # Labels and entries
+    ttk.Label(form, text="Product Name:").grid(row=0, column=0, padx=10, pady=5, sticky="e")
+    name_entry = ttk.Entry(form)
+    name_entry.grid(row=0, column=1, padx=10, pady=5)
+
+    ttk.Label(form, text="Barcode:").grid(row=1, column=0, padx=10, pady=5, sticky="e")
+    barcode_entry = ttk.Entry(form)
+    barcode_entry.grid(row=1, column=1, padx=10, pady=5)
+
+    ttk.Label(form, text="Stock:").grid(row=2, column=0, padx=10, pady=5, sticky="e")
+    stock_entry = ttk.Entry(form)
+    stock_entry.grid(row=2, column=1, padx=10, pady=5)
+
+    ttk.Label(form, text="Price:").grid(row=3, column=0, padx=10, pady=5, sticky="e")
+    price_entry = ttk.Entry(form)
+    price_entry.grid(row=3, column=1, padx=10, pady=5)
+    ttk.Button(form, text="Submit", command=lambda: submit_product(form, name_entry, barcode_entry, stock_entry, price_entry)).grid(row=4, column=0, columnspan=2, pady=15)
+
+
+# Submit button
+def submit_product(form, name_entry, barcode_entry, stock_entry, price_entry):
+    name = name_entry.get()
+    barcode = barcode_entry.get()
+    stock = stock_entry.get()
+    price = price_entry.get()
+    new_product = Product(name, price, stock, barcode)
+    add_products(new_product)
+    print(new_product)
+    form.destroy()  # Close the form after submission
+    
+
+
 
 # Main function to assemble the app
 def init_screen():
@@ -215,8 +269,14 @@ def init_screen():
     calculate_total(tree, total_price_var)
     total_price = ttk.Label(right_frame, text="Total", font=barcode_font, textvariable=total_price_var)
     total_price.grid(row=4, column=1)
+
+    add_product_button = create_button(left_bottom_frame, lambda: open_add_product_form(root), "Add To Stock")
+    add_product_button.grid(row=0, column=1, sticky=(W, E))
+    add_discount_button = create_button(left_bottom_frame, button_test, "Discount")
+    add_discount_button.grid(row=1, column=1, sticky=(W, E))
+
     # Configure grid weights
-    configure_grid_weights(root, content, left_top_frame, right_frame)
+    configure_grid_weights(root, content, left_top_frame, right_frame, left_bottom_frame)
     barcode_entry.focus()
     root.bind("<Return>", lambda event: add_item_to_cart(cart, tree, barcode, total_price_var))
     root.mainloop()

@@ -52,6 +52,8 @@ Avoiding circular imports
 Writing MVP-level functional apps without overengineering
 
 🔮 Future Improvements
+ Make a working discount button (Now it's just for visual)
+
  Add stock checks before adding to the cart
 
  Display error messages for invalid barcodes or empty stock

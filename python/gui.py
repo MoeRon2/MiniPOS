@@ -125,40 +125,34 @@ def configure_grid_weights(root, content, left_top_frame, right_frame, left_bott
     left_bottom_frame.columnconfigure(1, weight=0)
     left_bottom_frame.columnconfigure(2, weight=1)
 
-def increase_quantity(tree, total_price_var):
+def increase_quantity(tree, total_price_var, cart: Cart):
     selected = tree.focus()  # Get the selected item's ID
     if not selected:
-        return  # Nothing selected
+        return   # Nothing selected
 
     current_values = tree.item(selected, "values")  # Get current values tuple
-    print(current_values)
-    new_stock = int(current_values[2])  # Column 1 is index 1
-    new_stock += 1  # Increase it
+    name = current_values[0]
+    # Find the current item's real model
+    current_item = cart.find_item(name)
+    cart.add_item(current_item)
 
-    # Replace the old values with updated quantity
-    updated_values = (current_values[0], current_values[1], new_stock)  # update column 1
-    tree.item(selected, values=updated_values)
+    refresh_cart_treeview(tree, cart, total_price_var)
+    # calculate_total(tree, total_price_var)
 
-    calculate_total(tree, total_price_var)
-
-def decrement_quantity(treev, total_price_var):
-    selected = treev.selection()
+def decrement_quantity(treev, total_price_var, cart: Cart):
+    selected = treev.focus()
     if not selected:
         return  # nothing selected
 
-    item_id = selected[0]
-    values = treev.item(item_id, "values")
+    current_values = treev.item(selected, "values")  # Get current values tuple
+    name = current_values[0]
 
-    name, price, stock = values
-    stock = int(stock)
+    current_item = cart.find_item(name)
+    cart.remove_item(current_item)
 
-    if stock <= 1:
-        treev.delete(item_id)
-    else:
-        new_values = (name, price, stock - 1)
-        treev.item(item_id, values=new_values)
+    refresh_cart_treeview(treev, cart, total_price_var)
 
-    calculate_total(treev, total_price_var)
+    
 
 def increment():
     print("You pressed increment!")
@@ -184,8 +178,10 @@ def add_item_to_cart(cart, treev, barcode, total_price_var):
 def refresh_cart_treeview(treev, cart, total_price_var):
     treev.delete(*treev.get_children())
     for cart_item in cart:
-        treev.insert('', 'end', values=(cart_item.name, cart_item.price, cart_item.quantity))
+        if cart_item.quantity > 0:
+            treev.insert('', 'end', values=(cart_item.name, cart_item.price, cart_item.quantity))
     total_price_var.set(cart.get_total_price())
+
 
 def button_test():
     print("button clicked")
@@ -278,8 +274,8 @@ def init_screen():
     tree = create_treeview_withscroll(left_top_frame)
     barcode = StringVar()
     barcode_entry = create_barcode_entry(right_frame, barcode)
-    increment_button = create_button(right_frame, lambda: increase_quantity(tree, total_price_var), "+")
-    decrement_button = create_button(right_frame, lambda: decrement_quantity(tree, total_price_var), "-")
+    increment_button = create_button(right_frame, lambda: increase_quantity(tree, total_price_var, cart), "+")
+    decrement_button = create_button(right_frame, lambda: decrement_quantity(tree, total_price_var, cart), "-")
     increment_button.grid(row=1, column=1, sticky="", pady=(20, 0), padx=(20, 20))
     decrement_button.grid(row=2, column=1, sticky="")
     barcode_font = font.Font(family='Helvetica', name='appHighlightFont', size=24)

@@ -3,6 +3,7 @@
 
 import sqlite3
 from Product import Product
+from Cart import CartItem
 
 
 # Makes a connection to the sqlite database
@@ -20,13 +21,13 @@ def add_products(product):
         cur.execute("""INSERT INTO products (name, price, stock, barcode) VALUES (?, ?, ?, ?)""", product_data)
         con.commit()
 
-def add_to_cart(barcode):
+def get_item(barcode, cart):
     with get_connection() as con:
         cur = con.cursor()
         res = cur.execute("""SELECT name, price, stock, barcode FROM products WHERE barcode = ?""", (barcode,))
         attributes = res.fetchone()
         print(attributes)
-        product = Product(*attributes)
+        product = CartItem(*attributes, cart)
         print(product)
         return product
 

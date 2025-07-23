@@ -2,11 +2,12 @@ from tkinter import *
 from tkinter import ttk
 from tkinter import font
 
-from db import add_products, get_products, add_to_cart
+from db import add_products, get_item, get_products, get_item
 from Cart import Cart, CartItem
 from Product import Product
 
 
+cart = Cart()
 
 # root window
 def create_root_window():
@@ -162,54 +163,61 @@ def calculate_total(tree, total_price_var):
     total_price_var.set(f"{total:.2f}")
 
 
-def add_item_to_cart(treev, barcode):
-    product = add_to_cart(barcode.get())
+def add_item_to_cart(cart, treev, barcode):
+    #  add_to_cart(cart, barcode.get())
+    cart_item = get_item(barcode.get(), cart)
+    cart.add_item(cart_item)
     barcode.set("")
-    treev.insert('', 'end', text='L1', values=(product.name, product.price, 1))
-    print("Added A Product ", product)
+    refresh_cart_treeview(treev, cart)
 
+def update_cart_treeview(treev, cart_item):
+    for item_id in treev.get_children():
+        values = treev.item(item_id, "values")
+        name = values[0]
+        if name == cart_item.name:
+            # Update the existing row's quantity
+            new_values = (cart_item.name, cart_item.price, cart_item.quantity)
+            treev.item(item_id, values=new_values)
+            return
+
+    # If not found, insert a new one
+    treev.insert('', 'end', values=(cart_item.name, cart_item.price, cart_item.quantity))
+
+def refresh_cart_treeview(treev, cart):
+    treev.delete(*treev.get_children())
+    for cart_item in cart:
+        treev.insert('', 'end', values=(cart_item.name, cart_item.price, cart_item.quantity))
 
 
 # Main function to assemble the app
 def init_screen():
     root = create_root_window()
     content = create_content_frame(root)
-
     cart_image = PhotoImage(file="shopping-cart.png").subsample(5, 5)
-    
     total_price_var = StringVar()   
-
-
     # Create and configure frames
     left_top_frame = create_left_top_frame(content)
     left_bottom_frame = create_left_bottom_frame(content)
     right_frame = create_right_frame(content)
-
     # Create widgets inside frames
     create_cart_label(left_top_frame, cart_image)
     tree = create_treeview_withscroll(left_top_frame)
-
     barcode = StringVar()
     barcode_entry = create_barcode_entry(right_frame, barcode)
     increment_button = create_button(right_frame, lambda: increase_quantity(tree, total_price_var), "+")
     decrement_button = create_button(right_frame, lambda: decrement_quantity(tree, total_price_var), "-")
     increment_button.grid(row=1, column=1, sticky="", pady=(20, 0), padx=(20, 20))
     decrement_button.grid(row=2, column=1, sticky="")
-
     barcode_font = font.Font(family='Helvetica', name='appHighlightFont', size=24)
     total_label = ttk.Label(right_frame,text="Total", font=barcode_font)
     total_label.grid(row=3, column=1)
-
     calculate_total(tree, total_price_var)
-
     total_price = ttk.Label(right_frame, text="Total", font=barcode_font, textvariable=total_price_var)
     total_price.grid(row=4, column=1)
-    
     # Configure grid weights
     configure_grid_weights(root, content, left_top_frame, right_frame)
-
     barcode_entry.focus()
-    root.bind("<Return>", lambda event: add_item_to_cart(tree, barcode))
+    root.bind("<Return>", lambda event: add_item_to_cart(cart, tree, barcode))
     root.mainloop()
 
 

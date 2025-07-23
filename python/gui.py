@@ -114,6 +114,9 @@ def configure_grid_weights(root, content, left_top_frame, right_frame, left_bott
     right_frame.rowconfigure(3, weight=0)
     right_frame.rowconfigure(4, weight=0)
     right_frame.rowconfigure(5, weight=1)
+    right_frame.rowconfigure(6, weight=1)
+    right_frame.rowconfigure(7, weight=1)
+    right_frame.rowconfigure(8, weight=0)
 
     left_bottom_frame.rowconfigure(0, weight=1)
     left_bottom_frame.rowconfigure(1, weight=1)
@@ -256,6 +259,11 @@ def submit_product(form, name_entry, barcode_entry, stock_entry, price_entry):
     print(new_product)
     form.destroy()  # Close the form after submission
     
+# We will take the current price total_var and show it on the previous_total_var then reset everything in the cart and change the stock
+def finish_sale(tree, cart : Cart, previous, current_price):
+    cart.cart_clear()
+    previous.set(f"Previous Total: {current_price.get()}")
+    refresh_cart_treeview(tree, cart, current_price)
 
 
 
@@ -282,13 +290,25 @@ def init_screen():
     total_label = ttk.Label(right_frame,text="Total", font=barcode_font)
     total_label.grid(row=3, column=1)
     calculate_total(tree, total_price_var)
+    
     total_price = ttk.Label(right_frame, text="Total", font=barcode_font, textvariable=total_price_var)
     total_price.grid(row=4, column=1)
+
+    previous_total_var = StringVar()
+    previous_total_var.set("Previous Total: ")
+
+    previous_total = ttk.Label(right_frame, text="Previous Total", font=barcode_font, textvariable=previous_total_var)
+    previous_total.grid(row=5, column=1)
 
     add_product_button = create_button(left_bottom_frame, lambda: open_add_product_form(root), "Add To Stock")
     add_product_button.grid(row=0, column=1, sticky=(W, E))
     add_discount_button = create_button(left_bottom_frame, button_test, "Discount")
     add_discount_button.grid(row=1, column=1, sticky=(W, E))
+
+
+
+    finish_sale_button = create_button(right_frame, lambda: finish_sale(tree, cart, previous_total_var, total_price_var), "Finish Sale")
+    finish_sale_button.grid(row=6, column=1)
 
     # Configure grid weights
     configure_grid_weights(root, content, left_top_frame, right_frame, left_bottom_frame)

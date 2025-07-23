@@ -21,6 +21,15 @@ def add_products(product):
         cur.execute("""INSERT INTO products (name, price, stock, barcode) VALUES (?, ?, ?, ?)""", product_data)
         con.commit()
 
+def update_stock(cart_item_list):
+    with get_connection() as con:
+        cur = con.cursor()
+        for item in cart_item_list:
+            cur.execute("""UPDATE products SET stock = stock - ? WHERE barcode = ?""", (item.quantity, item.barcode))
+        con.commit()
+
+
+
 def get_item(barcode, cart):
     with get_connection() as con:
         cur = con.cursor()

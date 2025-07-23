@@ -1,5 +1,6 @@
 from Product import Product
 
+
 class Cart():
     def __init__(self):
         self.total_price = 0
@@ -19,11 +20,21 @@ class Cart():
             if item == cart_item:
                 item.decrement_quantity()
                 self.total_price -= item.price
+                if self.total_price < 0:
+                    self.total_price == 0
                 if item.quantity == 0:
                     self.cart.remove(item)
                 return
 
     
+    def cart_clear(self):
+        # self.cart and self does the same thing while iterating, I should probably stick to one convention
+        from db import update_stock
+        update_stock(self.cart)
+        self.cart.clear()
+        self.total_price = 0
+    
+
     def get_cart_items(self):
         return self.cart
     
@@ -66,8 +77,8 @@ class CartItem(Product):
 
     def __repr__(self):
         return f"Name: {self.name} , Barcode: {self.barcode} , Quantity: {self.quantity}, Price: {self.price}"
-    
-    
+
+  
     def increment_quantity(self):
         self.quantity += 1
 

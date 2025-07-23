@@ -163,30 +163,31 @@ def calculate_total(tree, total_price_var):
     total_price_var.set(f"{total:.2f}")
 
 
-def add_item_to_cart(cart, treev, barcode):
+def add_item_to_cart(cart, treev, barcode, total_price_var):
     #  add_to_cart(cart, barcode.get())
     cart_item = get_item(barcode.get(), cart)
     cart.add_item(cart_item)
     barcode.set("")
-    refresh_cart_treeview(treev, cart)
+    refresh_cart_treeview(treev, cart, total_price_var)
 
-def update_cart_treeview(treev, cart_item):
-    for item_id in treev.get_children():
-        values = treev.item(item_id, "values")
-        name = values[0]
-        if name == cart_item.name:
-            # Update the existing row's quantity
-            new_values = (cart_item.name, cart_item.price, cart_item.quantity)
-            treev.item(item_id, values=new_values)
-            return
+# def update_cart_treeview(treev, cart_item):
+#     for item_id in treev.get_children():
+#         values = treev.item(item_id, "values")
+#         name = values[0]
+#         if name == cart_item.name:
+#             # Update the existing row's quantity
+#             new_values = (cart_item.name, cart_item.price, cart_item.quantity)
+#             treev.item(item_id, values=new_values)
+#             return
 
     # If not found, insert a new one
-    treev.insert('', 'end', values=(cart_item.name, cart_item.price, cart_item.quantity))
+    # treev.insert('', 'end', values=(cart_item.name, cart_item.price, cart_item.quantity))
 
-def refresh_cart_treeview(treev, cart):
+def refresh_cart_treeview(treev, cart, total_price_var):
     treev.delete(*treev.get_children())
     for cart_item in cart:
         treev.insert('', 'end', values=(cart_item.name, cart_item.price, cart_item.quantity))
+    total_price_var.set(cart.get_total_price())
 
 
 # Main function to assemble the app
@@ -217,7 +218,7 @@ def init_screen():
     # Configure grid weights
     configure_grid_weights(root, content, left_top_frame, right_frame)
     barcode_entry.focus()
-    root.bind("<Return>", lambda event: add_item_to_cart(cart, tree, barcode))
+    root.bind("<Return>", lambda event: add_item_to_cart(cart, tree, barcode, total_price_var))
     root.mainloop()
 
 

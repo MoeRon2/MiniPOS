@@ -17,6 +17,9 @@ class Cart():
     def get_cart_items(self):
         return self.cart
     
+    def get_total_price(self):
+        return str(self.total_price) + "$"
+    
     def __repr__(self):
         return f"Total is {self.total_price} and cart items are: {self.cart}"
     

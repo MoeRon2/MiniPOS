@@ -180,18 +180,6 @@ def add_item_to_cart(cart, treev, barcode, total_price_var):
     barcode.set("")
     refresh_cart_treeview(treev, cart, total_price_var)
 
-# def update_cart_treeview(treev, cart_item):
-#     for item_id in treev.get_children():
-#         values = treev.item(item_id, "values")
-#         name = values[0]
-#         if name == cart_item.name:
-#             # Update the existing row's quantity
-#             new_values = (cart_item.name, cart_item.price, cart_item.quantity)
-#             treev.item(item_id, values=new_values)
-#             return
-
-    # If not found, insert a new one
-    # treev.insert('', 'end', values=(cart_item.name, cart_item.price, cart_item.quantity))
 
 def refresh_cart_treeview(treev, cart, total_price_var):
     treev.delete(*treev.get_children())
@@ -228,6 +216,37 @@ def open_add_product_form(root):
     price_entry = ttk.Entry(form)
     price_entry.grid(row=3, column=1, padx=10, pady=5)
     ttk.Button(form, text="Submit", command=lambda: submit_product(form, name_entry, barcode_entry, stock_entry, price_entry)).grid(row=4, column=0, columnspan=2, pady=15)
+    ttk.Button(form, text="See Products in Stock", command=lambda: get_products_in_stock(form)).grid(row=5, column=0, columnspan=2, pady=10)
+
+
+def get_products_in_stock(root):
+    stock_list = tk.Toplevel(root)
+    stock_list.title("Items in Stock")
+    stock_list.geometry("800x800")
+
+    stock_list_tree = create_treeview_withscroll(stock_list)
+    stock_list_tree['columns'] = ("Name", "Price", "Stock", "Barcode")
+    stock_list_tree['show'] = 'headings'
+    stock_list_tree.column("Name", anchor=W, width=10)
+    stock_list_tree.column("Price", anchor=CENTER, width=80)
+    stock_list_tree.column("Stock", anchor=CENTER, width=80)
+    stock_list_tree.column("Barcode", anchor=CENTER, width=120)
+    stock_list_tree.heading("Name", text="Name", anchor=CENTER)
+    stock_list_tree.heading("Price", text="Price", anchor=CENTER)
+    stock_list_tree.heading("Stock", text="Stock", anchor=CENTER)
+    stock_list_tree.heading("Barcode", text="Barcode", anchor=CENTER)
+    stock_list.columnconfigure(0, weight=0)
+    stock_list.columnconfigure(1, weight=1)
+    stock_list.rowconfigure(0, weight=0)
+    stock_list.rowconfigure(1, weight=1)
+    refresh_tree_view_stock(stock_list_tree)
+
+def refresh_tree_view_stock(treev):
+    treev.delete(*treev.get_children())
+    for product in get_products():
+        treev.insert('', 'end', values=(product.name, product.price, product.stock, product.barcode))
+
+
 
 
 # Submit button
